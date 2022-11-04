@@ -1,1 +1,1 @@
-web: gunicorn --workers 1 --threads 1 passenger_wsgi:application
+web: gunicorn --workers 1 --threads 1 wsgi:application
