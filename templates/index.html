@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="Jack Wang">
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <title>Prediction of Credit Card Fault</title>
+    <style>
+        .column {
+            width: 500px;
+            float: left
+        }
+
+        body {
+            padding-top: 70px;
+        }
+
+        footer {
+            margin: 50px 0;
+        }
+    </style>
+
+    <style type="text/css">
+        .text {
+            font-size: 16px;
+        }
+
+        .item {
+            margin-bottom: 18px;
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+
+        .box-card {
+            width: 480px;
+        }
+
+        .el-button {
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Prediction of Credit Card Fault</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Project Descriptions -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Prediction of Credit Card Fault
+                </h1>
+            </div>
+        </div>
+        This project is to test machine learning algorithms on Prediction of Credit Card Faults.
+
+        <!-- Algorithm - XGBOOST -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Algorithm - xgboost
+                </h1>
+            </div>
+        </div>
+
+        <!-- Model metrics - ROC curve -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Model metrics
+                </h1>
+            </div>
+        </div>
+
+
+        <!-- Prediction: adjust threshold -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Update threshold
+                </h1>
+            </div>
+        </div>
+
+        <form action="/threshold" method="POST">
+            <label for="threshold">Threshold (0~1):</label><br>
+            <input type="text" id="threshold" name="threshold"><br>
+        </form>
+        <!-- Current threshold value -->
+        <div>
+            Threshold: {{ current_threshold }} <br>
+        </div>
+
+        <!-- Prediction: input parameters -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Prediction
+                </h1>
+            </div>
+        </div>
+
+        <form action="/predict" method="POST">
+            <label for="int_rate">Interest Rate: </label> <br> <input type="text" name="int_rate" value="14.34"><br>
+            <label for="loan_amnt">Loan Amount: </label> <br> <input type="text" name="loan_amnt" value="15000"><br>
+            <label for="term">Term(month): </label> <br> <input type="text" name="term" value="36"><br>
+            <label for="fund_rate">Fund Rate: </label> <br> <input type="text" name="fund_rate" value="25.0"><br>
+            <label for="bc_open_to_buy">bc_open_to_buy: </label> <br> <input type="text" name="bc_open_to_buy"
+                value="98.0"><br>
+            <label for="total_il_high_credit_limit">total_il_high_credit_limit: </label> <br> <input type="text"
+                name="total_il_high_credit_limit" value="2.8"><br>
+            <label for="dti">Debt to Income Ratio: </label> <br> <input type="text" name="dti" value="1.31"><br>
+            <label for="annual_inc">Annual Income: </label> <br> <input type="text" name="annual_inc" value="0.53"><br>
+            <label for="bc_util">bc_util: </label> <br> <input type="text" name="bc_util" value="10"><br>
+
+            <input type="submit" value="Submit">
+        </form>
+
+        <!-- <div> Current prediction: {{ prediction_json }} </div>  -->
+        <div> 
+            <b>=====Parameters=====</b><br>
+            <b>{{prediction_param}}</b><br>
+            <b>=====Prediction Result=====</b><br>
+            <b>Risk of default(0~100%):</b> {{ prediction_json }}<br>
+            <b>Threshold:</b> {{ current_threshold }} <br>
+            <b>Loan Status:</b> {{ loan_status }}<br>
+        </div>
+        <!-- form -->
+
+        <!-- response -->
+</body>
+
+
+</html>
