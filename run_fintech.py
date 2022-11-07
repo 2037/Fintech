@@ -82,7 +82,8 @@ def makecalc():
                         'safe': round(1 - prediction, 2),
                         'threshold': threshold}
 
-    return redirect(url_for('homepage'))
+    return redirect(url_for('index'))
+    # return redirect(url_for('homepage'))
 
 
 @app.route('/threshold', methods=['POST', 'GET'])
@@ -91,14 +92,17 @@ def update_thres():
     global threshold
     new_thres = 0
     try:
-        request.get_data()
-        new_thres = request.form['threshold']
+        new_thres = float(request.form['threshold'])
     except:
         pass
     
     if request.method == 'POST':
         threshold = new_thres
-        return redirect(url_for('homepage')) #url for function name
+        # print(url_for('homepage'))
+        # url_for('homepage')
+        # return redirect(url_for('.index')) #url for function name
+        # return redirect("https://www.google.com") #url for function name
+        return redirect(url_for('index')) #url for function name
 
         # return jsonify(threshold)
     elif request.method == 'GET':
@@ -149,8 +153,9 @@ def upload_feature():
 
 
 @app.route('/',methods=["GET","POST"])
+@app.route('/index',methods=["GET","POST"])
 @cross_origin()
-def homepage():
+def index():
     global threshold,prediction_result
 
     # update prediction and threshold
@@ -174,5 +179,5 @@ def homepage():
 
 if __name__ == '__main__':
     threshold = 0.1
-    app.run(host="localhost",port=5000,debug=True)
+    app.run()
     # app.run(debug=True, host='0.0.0.0')
