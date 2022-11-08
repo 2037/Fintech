@@ -9,10 +9,10 @@
     <meta name="description" content="">
     <meta name="author" content="Jack Wang">
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
+<!-- 
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 
     <title>Prediction of Credit Card Fault</title>
     <style>
@@ -82,73 +82,108 @@
         <!-- Algorithm - XGBOOST -->
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Algorithm - xgboost
+                <h1 class="page-header">XGBoost introduction
                 </h1>
             </div>
         </div>
+        <h2 id="what-is-xgboost-">What is XGBoost?</h2>
+        <p>XGBoost is an open-source machine-learning project developed by Tianqi Chen and Carlos Guestrin. It efficiently implements the GBDT algorithm and makes many improvements in algorithm and engineering. It is widely used in Kaggle competitions and many other machine learning competitions and has achieved good results.</p>
+        <p>XGBoost is essentially a GBDT (Gradient Boosting Decision Tree) that strives to maximize speed and efficiency, so it is called X (Extreme) GBoosted. Including the aforementioned, both are boosting methods. In addition to some differences in algorithm from traditional GBDT, XGBoost has also done a lot of optimization in engineering implementation. </p>
+        
+        <h2 id="where-is-the-advantage-of-xgboost-">What is the advantage of XGBoost?</h2>
+        <p>XGBoost uses Taylor expansion to get first-order and second-order partial derivatives, which contributes faster and more accurate gradient descendence. Using Taylor expansion to obtain the second-order derivative form of the function as the independent variable can be used without selecting the specific form of the loss function. Leaf splitting optimization can be performed only by relying on the value of the input data, which essentially separates the selection of the loss function from the optimization of the model algorithm/parameter selection. This decoupling increases the applicability of XGBoost, making it possible to select on-demand loss functions for either classification or regression.</p>
+        
+        <h2 id="how-is-xgboost-different-from-gbdt-">How is XGBoost different from GBDT?</h2>
+        <ul>
+        <li>GBDT is a machine learning algorithm and XGBoost is an engineering implementation of this algorithm.</li>
+        <li>When using CART as the base classifier, XGBoost explicitly adds a regular term to control the complexity of the model, which is beneficial to prevent overfitting and improve the generalization ability of the model.</li>
+        <li>GBDT only uses the first-order derivative information of the cost function during model training. XGBoost performs second-order Taylor expansion on the cost function and can use both the first-order and second-order derivatives at the same time.</li>
+        <li>Traditional GBDT uses CART as the base classifier, and XGBoost supports multiple types of base classifiers, such as linear classifiers.</li>
+        <li>Traditional GBDT uses all the data in each iteration, XGBoost adopts a strategy similar to Random Forest, which supports the sampling of data.</li>
+        <li>The traditional GBDT is not designed to deal with missing values, XGBoost can automatically learn the missing value processing strategy.</li>
+        </ul>
 
+        <h2>Objective function formula</h2>
+        <img src="xgboost0.png"><br>
+        [0] Gradient Tree Boosting objective function<br>
+        <img src="xgboost1.png"><br>
+        [1] XGBoost objective using second-order Taylor approximation<br>
+        [2] (Remove the constant terms and) plug it into objective function<br>
+        <img src="xgboost2.png"><br>
+        [3] First and second order gradient statistics of the loss function
+        
+        
         <!-- Model metrics - ROC curve -->
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Model metrics
+                <h1 class="page-header">Model metrics - ROC curve
                 </h1>
             </div>
         </div>
+        <img src="ROC_curve.png"><br>
+        Receiver operating characteristic curve(ROC Curve). <br>
+        The perfect classification is on the left top corner, representing all positive classification is correct (TPR=1), and no wrong negative classification (FPR=0). <br>
+        The closer to that corner the curves is drawn, the better the model/predictor is. <br>
+        Area under the curve of model in validation set is 0.71 (AUC_valid = 0.71).
 
-
-        <!-- Prediction: adjust threshold -->
+        <!-- Prediction: input parameters -->
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Update threshold
+                <h1 class="page-header">Prediction on risk of default
                 </h1>
             </div>
         </div>
+        <form action="/predict" method="POST">
+            <label for="int_rate">Interest Rate: </label> <br> <input type="text" name="int_rate" value="14.34"><br>
+            <label for="loan_amnt">Loan Amount: </label> <br> <input type="text" name="loan_amnt" value="15000"><br>
+            <label for="term">Term(month): </label> <br> <input type="text" name="term" value="36"><br>
+            <label for="fund_rate">Fund Rate: </label> <br> <input type="text" name="fund_rate" value="25.0"><br>
+            <label for="bc_open_to_buy">Total open to buy: </label> <br> <input type="text" name="bc_open_to_buy"
+                value="98.0"><br>
+            <label for="total_il_high_credit_limit">Total installment high credit/credit limit: </label> <br> <input type="text"
+                name="total_il_high_credit_limit" value="2.8"><br>
+            <label for="dti">Debt to Income Ratio: </label> <br> <input type="text" name="dti" value="1.31"><br>
+            <label for="annual_inc">Annual Income: </label> <br> <input type="text" name="annual_inc" value="53"><br>
+            <label for="bc_util">Ratio of balance to credit limit: </label> <br> <input type="text" name="bc_util" value="10"><br>
 
+            <input type="submit" value="Submit">
+        </form>
+        
+        <!-- Prediction: adjust threshold -->
+        <div><h2>Update threshold</h2></div>
         <form action="/threshold" method="POST">
             <label for="threshold">Threshold (0~1):</label><br>
             <input type="text" id="threshold" name="threshold"><br>
         </form>
         <!-- Current threshold value -->
         <div>
+            (hit enter to submit)<br>
             Threshold: {{ current_threshold }} <br>
         </div>
-
-        <!-- Prediction: input parameters -->
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Prediction
-                </h1>
-            </div>
-        </div>
-
-        <form action="/predict" method="POST">
-            <label for="int_rate">Interest Rate: </label> <br> <input type="text" name="int_rate" value="14.34"><br>
-            <label for="loan_amnt">Loan Amount: </label> <br> <input type="text" name="loan_amnt" value="15000"><br>
-            <label for="term">Term(month): </label> <br> <input type="text" name="term" value="36"><br>
-            <label for="fund_rate">Fund Rate: </label> <br> <input type="text" name="fund_rate" value="25.0"><br>
-            <label for="bc_open_to_buy">bc_open_to_buy: </label> <br> <input type="text" name="bc_open_to_buy"
-                value="98.0"><br>
-            <label for="total_il_high_credit_limit">total_il_high_credit_limit: </label> <br> <input type="text"
-                name="total_il_high_credit_limit" value="2.8"><br>
-            <label for="dti">Debt to Income Ratio: </label> <br> <input type="text" name="dti" value="1.31"><br>
-            <label for="annual_inc">Annual Income: </label> <br> <input type="text" name="annual_inc" value="0.53"><br>
-            <label for="bc_util">bc_util: </label> <br> <input type="text" name="bc_util" value="10"><br>
-
-            <input type="submit" value="Submit">
-        </form>
-
+        
+        
+        
         <!-- <div> Current prediction: {{ prediction_json }} </div>  -->
         <div> 
-            <b>=====Parameters=====</b><br>
+            <h2>Input Parameters</h2>
             <b>{{prediction_param}}</b><br>
-            <b>=====Prediction Result=====</b><br>
+            <h2>Prediction Result</h2>
             <b>Risk of default(0~100%):</b> {{ prediction_json }}<br>
             <b>Threshold:</b> {{ current_threshold }} <br>
             <b>Loan Status:</b> {{ loan_status }}<br>
         </div>
-        <!-- form -->
 
-        <!-- response -->
+        
+        <h2 id="Parameter explaination">Explaination</h1>
+        <p>&quot;int_rate&quot;: The effective interest rate.<br>
+        &quot;loan_amnt&quot;: Loan Amount.<br>
+        &quot;term&quot;: Terms in months.<br>
+        &quot;fund_rate&quot;: The total amount committed to that loan.<br>
+        &quot;bc_open_to_buy&quot;: Total open to buy on revolving bankcards.<br>
+        &quot;total_il_high_credit_limit&quot;: Total installment high credit/credit limit.<br>
+        &quot;dti&quot;: A ratio calculated using the borrower's total monthly debt payments on the total debt obligations, excluding mortgage and the requested LC loan, divided by the borrower's self-reported monthly income.<br>
+        &quot;annual_inc&quot;: The self-reported annual income provided by the borrower during registration.<br>
+        &quot;bc_util&quot;: Ratio of total current balance to high credit/credit limit for all bankcard accounts.<br></p>
 </body>
 
 
