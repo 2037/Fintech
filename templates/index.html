@@ -103,13 +103,13 @@
         <li>The traditional GBDT is not designed to deal with missing values, XGBoost can automatically learn the missing value processing strategy.</li>
         </ul>
 
-        <h2>Objective function formula</h2>
-        <img src="../assets/xgboost0.png" /><br>
+        <h2>Objective function formula 123</h2>
+        <img src="{{url_for('static', filename='xgboost0.png')}} " /><br>
         [0] Gradient Tree Boosting objective function<br>
-        <img src="./assets/xgboost1.png" /><br>
+        <img src="{{url_for('static', filename='xgboost1.png')}} " /><br>
         [1] XGBoost objective using second-order Taylor approximation<br>
         [2] (Remove the constant terms and) plug it into objective function<br>
-        <img src="./assets/xgboost2.png" /><br>
+        <img src="{{url_for('static', filename='xgboost2.png')}} " /><br>
         [3] First and second order gradient statistics of the loss function
         
         
@@ -120,7 +120,7 @@
                 </h1>
             </div>
         </div>
-        <img src="../assets/ROC_curve.png" /><br>
+        <img src="{{url_for('static', filename='ROC_curve.png')}} " /><br>
         Receiver operating characteristic curve(ROC Curve). <br>
         The perfect classification is on the left top corner, representing all positive classification is correct (TPR=1), and no wrong negative classification (FPR=0). <br>
         The closer to that corner the curves is drawn, the better the model/predictor is. <br>
