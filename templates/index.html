@@ -6,15 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="">
-    <meta name="author" content="Jack Wang">
+    <meta name="description" content="Fintech">
+    <meta name="author" content="Liuming (Jack) Wang">
+
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-<!-- 
+    <!-- 
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 
     <title>Prediction of Credit Card Fault</title>
+
     <style>
         .column {
             width: 500px;
@@ -30,33 +32,6 @@
         }
     </style>
 
-    <style type="text/css">
-        .text {
-            font-size: 16px;
-        }
-
-        .item {
-            margin-bottom: 18px;
-        }
-
-        .clearfix:before,
-        .clearfix:after {
-            display: table;
-            content: "";
-        }
-
-        .clearfix:after {
-            clear: both
-        }
-
-        .box-card {
-            width: 480px;
-        }
-
-        .el-button {
-            width: 200px;
-        }
-    </style>
 </head>
 
 <body>
@@ -73,11 +48,57 @@
         <!-- Project Descriptions -->
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Prediction of Credit Card Fault
+                <h1 class="page-header">Prediction of credit risk
                 </h1>
             </div>
         </div>
-        This project is to test machine learning algorithms on Prediction of Credit Card Faults.
+
+        <h2 id="project-objective">Project objective</h2>
+        <p>This project aims to predict the risk of loan given personal credit history, which is refered as a secondary
+            credit model populated among the P2P loan investors. </p>
+        <p>The traditional credit model, which requires complicated mathematical algorithms and a complete credit
+            history to rate one&#39;s credit score. Alternately, Secondary Credit Models are able to capture the
+            investment oppoturnity without external efforts of extracting insight from credit history in order to get
+            higher return with less risk in a short time. </p>
+        <blockquote>
+            <p>Some of the biggest investors at Lending Club and Prosper filter the available loans using a secondary
+                credit model, which allows them to instantly calculate the likely ROI of each available loan,
+                identifying where there is an opportunity to earn above average returns. (<a
+                    href="https://www.lendingmemo.com/credit-model-lending-club-prosper/">Read More</a>)
+            </p>
+        </blockquote>
+        <img src="{{url_for('static', filename='p2p.png')}} " /><br>
+        Buying zones covering the high return and low risk cases as credit models missed the chances..<br><br>
+        <p>This web app used the following methodology: Train by batch, predict on the fly, serve via REST API, as the
+            training and persisting are done offline while prediction is done in real-time. The XGBoost model is trained
+            offline and deployed to AWS Elastic Beanstalk. This web is used on Flask as web framework. </p>
+        <h2 id="data-description-and-process">Data description and process</h2>
+        <p>From data downloaded from Lending Club, we intersected history and current data to get useful and valid
+            features. After loading lending club API of the year 2017 (443k) and selecting loans that are 36 months,
+            fully paid and charged off, 257k records with 108 features were transformed into 124 columns of features by
+            feature engineering, which involved column dropping, datetime transformation, one-hot Encoding, frequency
+            encoding(zip codes), ordinal feature encoding (grades and subgrades) and etc. The whole set (257k) of data
+            were split into training set (206k) and test set(51k). Training set was again split into training set and
+            validation set by 70%/30% in order to use early stopping to find the optimal number of boosting rounds.</p>
+        <p>Binary logistic regression is set to be objective function as we only predict two results, and as we predict
+            the probability of default we will set a threshold to predict whether the application for loan is dangerous
+            or safe. The tree booster parameters are set as following in xgb.train():</p>
+
+        <code>
+    params = {"objective": "binary:logistic", 
+              "booster" : "gbtree", 
+              "eta": 0.05, 
+              "max_depth": 6, 
+              "subsample": 0.6, 
+              "colsample_bytree": 0.7,
+              "silent": 1, 
+              "seed": 1234, 
+              "eval_metric": "auc",
+              "min_child_weight": 5} 
+    num_boost_round = 1500
+    early_stopping_rounds =50
+    </code>
+
 
         <!-- Algorithm - XGBOOST -->
         <div class="row">
@@ -87,23 +108,43 @@
             </div>
         </div>
         <h2 id="what-is-xgboost-">What is XGBoost?</h2>
-        <p>XGBoost is an open-source machine-learning project developed by Tianqi Chen and Carlos Guestrin. It efficiently implements the GBDT algorithm and makes many improvements in algorithm and engineering. It is widely used in Kaggle competitions and many other machine learning competitions and has achieved good results.</p>
-        <p>XGBoost is essentially a GBDT (Gradient Boosting Decision Tree) that strives to maximize speed and efficiency, so it is called X (Extreme) GBoosted. Including the aforementioned, both are boosting methods. In addition to some differences in algorithm from traditional GBDT, XGBoost has also done a lot of optimization in engineering implementation. </p>
-        
+        <p>XGBoost is an open-source machine-learning project developed by Tianqi Chen and Carlos Guestrin. It
+            efficiently implements the GBDT algorithm and makes many improvements in algorithm and engineering. It is
+            widely used in Kaggle competitions and many other machine learning competitions and has achieved good
+            results.</p>
+        <p>XGBoost is essentially a GBDT (Gradient Boosting Decision Tree) that strives to maximize speed and
+            efficiency, so it is called X (Extreme) GBoosted. Including the aforementioned, both are boosting methods.
+            In addition to some differences in algorithm from traditional GBDT, XGBoost has also done a lot of
+            optimization in engineering implementation. </p>
+
         <h2 id="where-is-the-advantage-of-xgboost-">What is the advantage of XGBoost?</h2>
-        <p>XGBoost uses Taylor expansion to get first-order and second-order partial derivatives, which contributes faster and more accurate gradient descendence. Using Taylor expansion to obtain the second-order derivative form of the function as the independent variable can be used without selecting the specific form of the loss function. Leaf splitting optimization can be performed only by relying on the value of the input data, which essentially separates the selection of the loss function from the optimization of the model algorithm/parameter selection. This decoupling increases the applicability of XGBoost, making it possible to select on-demand loss functions for either classification or regression.</p>
-        
+        <p>XGBoost uses Taylor expansion to get first-order and second-order partial derivatives, which contributes
+            faster and more accurate gradient descendence. Using Taylor expansion to obtain the second-order derivative
+            form of the function as the independent variable can be used without selecting the specific form of the loss
+            function. Leaf splitting optimization can be performed only by relying on the value of the input data, which
+            essentially separates the selection of the loss function from the optimization of the model
+            algorithm/parameter selection. This decoupling increases the applicability of XGBoost, making it possible to
+            select on-demand loss functions for either classification or regression.</p>
+
         <h2 id="how-is-xgboost-different-from-gbdt-">How is XGBoost different from GBDT?</h2>
         <ul>
-        <li>GBDT is a machine learning algorithm and XGBoost is an engineering implementation of this algorithm.</li>
-        <li>When using CART as the base classifier, XGBoost explicitly adds a regular term to control the complexity of the model, which is beneficial to prevent overfitting and improve the generalization ability of the model.</li>
-        <li>GBDT only uses the first-order derivative information of the cost function during model training. XGBoost performs second-order Taylor expansion on the cost function and can use both the first-order and second-order derivatives at the same time.</li>
-        <li>Traditional GBDT uses CART as the base classifier, and XGBoost supports multiple types of base classifiers, such as linear classifiers.</li>
-        <li>Traditional GBDT uses all the data in each iteration, XGBoost adopts a strategy similar to Random Forest, which supports the sampling of data.</li>
-        <li>The traditional GBDT is not designed to deal with missing values, XGBoost can automatically learn the missing value processing strategy.</li>
+            <li>GBDT is a machine learning algorithm and XGBoost is an engineering implementation of this algorithm.
+            </li>
+            <li>When using CART as the base classifier, XGBoost explicitly adds a regular term to control the complexity
+                of the model, which is beneficial to prevent overfitting and improve the generalization ability of the
+                model.</li>
+            <li>GBDT only uses the first-order derivative information of the cost function during model training.
+                XGBoost performs second-order Taylor expansion on the cost function and can use both the first-order and
+                second-order derivatives at the same time.</li>
+            <li>Traditional GBDT uses CART as the base classifier, and XGBoost supports multiple types of base
+                classifiers, such as linear classifiers.</li>
+            <li>Traditional GBDT uses all the data in each iteration, XGBoost adopts a strategy similar to Random
+                Forest, which supports the sampling of data.</li>
+            <li>The traditional GBDT is not designed to deal with missing values, XGBoost can automatically learn the
+                missing value processing strategy.</li>
         </ul>
 
-        <h2>Objective function formula 123</h2>
+        <h2>Objective function formula</h2>
         <img src="{{url_for('static', filename='xgboost0.png')}} " /><br>
         [0] Gradient Tree Boosting objective function<br>
         <img src="{{url_for('static', filename='xgboost1.png')}} " /><br>
@@ -111,8 +152,8 @@
         [2] (Remove the constant terms and) plug it into objective function<br>
         <img src="{{url_for('static', filename='xgboost2.png')}} " /><br>
         [3] First and second order gradient statistics of the loss function
-        
-        
+
+
         <!-- Model metrics - ROC curve -->
         <div class="row">
             <div class="col-lg-12">
@@ -122,9 +163,13 @@
         </div>
         <img src="{{url_for('static', filename='ROC_curve.png')}} " /><br>
         Receiver operating characteristic curve(ROC Curve). <br>
-        The perfect classification is on the left top corner, representing all positive classification is correct (TPR=1), and no wrong negative classification (FPR=0). <br>
+        The perfect classification is on the left top corner, representing all positive classification is correct
+        (TPR=1), and no wrong negative classification (FPR=0). <br>
         The closer to that corner the curves is drawn, the better the model/predictor is. <br>
         Area under the curve of model in validation set is 0.71 (AUC_valid = 0.71).
+
+        <img src="{{url_for('static', filename='feature_importance.png')}} " /><br>
+        Feature Importance Ranking. <br>
 
         <!-- Prediction: input parameters -->
         <div class="row">
@@ -140,17 +185,20 @@
             <label for="fund_rate">Fund Rate: </label> <br> <input type="text" name="fund_rate" value="25.0"><br>
             <label for="bc_open_to_buy">Total open to buy: </label> <br> <input type="text" name="bc_open_to_buy"
                 value="98.0"><br>
-            <label for="total_il_high_credit_limit">Total installment high credit/credit limit: </label> <br> <input type="text"
-                name="total_il_high_credit_limit" value="2.8"><br>
+            <label for="total_il_high_credit_limit">Total installment high credit/credit limit: </label> <br> <input
+                type="text" name="total_il_high_credit_limit" value="2.8"><br>
             <label for="dti">Debt to Income Ratio: </label> <br> <input type="text" name="dti" value="1.31"><br>
             <label for="annual_inc">Annual Income: </label> <br> <input type="text" name="annual_inc" value="53"><br>
-            <label for="bc_util">Ratio of balance to credit limit: </label> <br> <input type="text" name="bc_util" value="10"><br>
+            <label for="bc_util">Ratio of balance to credit limit: </label> <br> <input type="text" name="bc_util"
+                value="10"><br>
 
             <input type="submit" value="Submit">
         </form>
-        
+
         <!-- Prediction: adjust threshold -->
-        <div><h2>Update threshold</h2></div>
+        <div>
+            <h2>Update threshold</h2>
+        </div>
         <form action="/threshold" method="POST">
             <label for="threshold">Threshold (0~1):</label><br>
             <input type="text" id="threshold" name="threshold"><br>
@@ -160,11 +208,11 @@
             (hit enter to submit)<br>
             Threshold: {{ current_threshold }} <br>
         </div>
-        
-        
-        
+
+
+
         <!-- <div> Current prediction: {{ prediction_json }} </div>  -->
-        <div> 
+        <div>
             <h2>Input Parameters</h2>
             <b>{{prediction_param}}</b><br>
             <h2>Prediction Result</h2>
@@ -173,17 +221,21 @@
             <b>Loan Status:</b> {{ loan_status }}<br>
         </div>
 
-        
+
         <h2 id="Parameter explaination">Explaination</h1>
-        <p>&quot;int_rate&quot;: The effective interest rate.<br>
-        &quot;loan_amnt&quot;: Loan Amount.<br>
-        &quot;term&quot;: Terms in months.<br>
-        &quot;fund_rate&quot;: The total amount committed to that loan.<br>
-        &quot;bc_open_to_buy&quot;: Total open to buy on revolving bankcards.<br>
-        &quot;total_il_high_credit_limit&quot;: Total installment high credit/credit limit.<br>
-        &quot;dti&quot;: A ratio calculated using the borrower's total monthly debt payments on the total debt obligations, excluding mortgage and the requested LC loan, divided by the borrower's self-reported monthly income.<br>
-        &quot;annual_inc&quot;: The self-reported annual income provided by the borrower during registration.<br>
-        &quot;bc_util&quot;: Ratio of total current balance to high credit/credit limit for all bankcard accounts.<br></p>
+            <p>&quot;int_rate&quot;: The effective interest rate.<br>
+                &quot;loan_amnt&quot;: Loan Amount.<br>
+                &quot;term&quot;: Terms in months.<br>
+                &quot;fund_rate&quot;: The total amount committed to that loan.<br>
+                &quot;bc_open_to_buy&quot;: Total open to buy on revolving bankcards.<br>
+                &quot;total_il_high_credit_limit&quot;: Total installment high credit/credit limit.<br>
+                &quot;dti&quot;: A ratio calculated using the borrower's total monthly debt payments on the total debt
+                obligations, excluding mortgage and the requested LC loan, divided by the borrower's self-reported
+                monthly income.<br>
+                &quot;annual_inc&quot;: The self-reported annual income provided by the borrower during
+                registration.<br>
+                &quot;bc_util&quot;: Ratio of total current balance to high credit/credit limit for all bankcard
+                accounts.<br></p>
 </body>
 
 
