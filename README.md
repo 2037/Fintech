@@ -1,5 +1,8 @@
 # README
 
+## Credit risk predictor
+This project aims to predict the risk of loan given personal credit history, which is refered as a secondary credit model populated among the P2P loan investors. I used XGBoost, an efficient Gradient Boosting Decision Tree, as the predictor based on 206k credit records. The Web App is written in flask. It would be hosted on AWS ElasticBeanstalk. 
+
 ## Model deployement API
 
 * Run `run_fintech.py` to start the server
