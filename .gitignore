@@ -5,3 +5,5 @@
 !.elasticbeanstalk/*.global.yml
 # all py env
 env/
+# test notebook
+test.ipynb
